@@ -51,15 +51,15 @@ const state = {
   category: "All",
   sortBy: "subscribers",
   topN: 15,
-  theme: localStorage.getItem("yt-dashboard-theme") || "dark"
+  theme: localStorage.getItem("yt-dashboard-theme") || "light"
 };
 
 const charts = {};
 const els = {};
 
 const palette = [
-  "#22d3ee", "#60a5fa", "#a78bfa", "#f472b6", "#34d399",
-  "#fbbf24", "#fb7185", "#38bdf8", "#c084fc", "#4ade80"
+  "#0071e3", "#5e5ce6", "#af52de", "#ff2d55", "#ff9f0a",
+  "#30d158", "#64d2ff", "#bf5af2", "#ff453a", "#0a84ff"
 ];
 
 function $(selector) {
@@ -159,25 +159,27 @@ function baseOptions(extra = {}) {
           boxWidth: 12,
           boxHeight: 12,
           usePointStyle: true,
-          font: { family: "Inter", weight: "700" }
+          font: { family: "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif", weight: "700" }
         }
       },
       tooltip: {
-        backgroundColor: "rgba(8,17,31,0.96)",
-        borderColor: "rgba(34,211,238,0.4)",
+        backgroundColor: document.body.classList.contains("light") ? "rgba(29,29,31,0.94)" : "rgba(245,245,247,0.94)",
+        titleColor: document.body.classList.contains("light") ? "#fff" : "#111114",
+        bodyColor: document.body.classList.contains("light") ? "#fff" : "#111114",
+        borderColor: "rgba(0,113,227,0.28)",
         borderWidth: 1,
         padding: 13,
-        titleFont: { family: "Inter", size: 13, weight: "800" },
-        bodyFont: { family: "Inter", size: 12, weight: "600" }
+        titleFont: { family: "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif", size: 13, weight: "800" },
+        bodyFont: { family: "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif", size: 12, weight: "600" }
       }
     },
     scales: {
       x: {
-        ticks: { color: getChartTextColor(), font: { family: "Inter", weight: "700" } },
+        ticks: { color: getChartTextColor(), font: { family: "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif", weight: "700" } },
         grid: { color: getGridColor() }
       },
       y: {
-        ticks: { color: getChartTextColor(), font: { family: "Inter", weight: "700" } },
+        ticks: { color: getChartTextColor(), font: { family: "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif", weight: "700" } },
         grid: { color: getGridColor() }
       }
     },
@@ -257,7 +259,7 @@ function updateCharts(data) {
 }
 
 function createCharts() {
-  Chart.defaults.font.family = "Inter";
+  Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
   Chart.defaults.color = getChartTextColor();
 
   charts.subscriber = new Chart($("#subscriberChart"), {
@@ -323,8 +325,8 @@ function createCharts() {
       datasets: [{
         label: "Channel",
         data: [],
-        backgroundColor: "rgba(34, 211, 238, 0.58)",
-        borderColor: "rgba(34, 211, 238, 0.95)",
+        backgroundColor: "rgba(0, 113, 227, 0.46)",
+        borderColor: "rgba(0, 113, 227, 0.92)",
         borderWidth: 2
       }]
     },
@@ -548,7 +550,7 @@ function bindEvents() {
 
 function applyTheme() {
   document.body.classList.toggle("light", state.theme === "light");
-  els.themeToggle.textContent = state.theme === "light" ? "🌙" : "☀️";
+  els.themeToggle.textContent = state.theme === "light" ? "☾" : "☀";
 }
 
 function setupRevealAnimation() {

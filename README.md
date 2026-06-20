@@ -1,17 +1,20 @@
-# YouTube Pulse Dashboard
+# YouTube Pulse — Apple Style Dashboard
 
 Dashboard visualisasi data interaktif untuk Proyek Akhir CA4XB3 Visualisasi Data.
 
-## Isi project
-
-- `index.html` — struktur website statis.
-- `style.css` — tampilan responsif, animasi, light/dark mode, glassmorphism.
-- `app.js` — dataset, filter, KPI, Chart.js, tabel, dan interaktivitas.
-- `data/youtube_channels_cleaned.csv` — subset data yang sudah dibersihkan.
-
 ## Dataset
+Dataset: Kaggle — Global YouTube Statistics 2023  
+URL: https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023
 
-Sumber utama: Kaggle — Global YouTube Statistics 2023  
-https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023
+## Fitur
+- 5 chart interaktif dengan Chart.js
+- Tooltip, animasi, filter, search, sort, dan slider Top-N
+- KPI count-up
+- Insight otomatis
+- Tabel data dinamis
+- Download CSV hasil filter
+- Light/dark mode
+- Desain sleek bergaya Apple
 
-Dataset asli berisi data channel YouTube global seperti rank, nama channel, subscribers, video views, category, uploads, country, dan metadata lain. Untuk memenuhi kebutuhan project frontend static, data dipakai sebagai subset JSON/array di `app.js` dan CSV pembanding di folder `data`.
+## Deploy ke Vercel
+Website ini adalah static site. Import repository ke Vercel, pilih preset `Other`, lalu klik Deploy.
