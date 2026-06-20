@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dashboard visualisasi data interaktif berbasis data Kaggle Global YouTube Statistics 2023." />
+  <title>YouTube Pulse Dashboard | Visualisasi Data Interaktif</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-glow page-glow-one"></div>
+  <div class="page-glow page-glow-two"></div>
+
+  <header class="site-header" id="top">
+    <nav class="nav-shell">
+      <a class="brand" href="#top" aria-label="YouTube Pulse Dashboard">
+        <span class="brand-mark">YT</span>
+        <span>
+          <strong>YouTube Pulse</strong>
+          <small>Kaggle Data Dashboard</small>
+        </span>
+      </a>
+      <div class="nav-links" aria-label="Navigasi utama">
+        <a href="#overview">Overview</a>
+        <a href="#charts">Charts</a>
+        <a href="#insight">Insight</a>
+        <a href="#data-table">Data</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ganti tema dashboard">☀️</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section-reveal">
+      <div class="hero-copy">
+        <p class="eyebrow">Proyek Akhir — CA4XB3 Visualisasi Data</p>
+        <h1>Dashboard Visualisasi Data YouTube Global 2023</h1>
+        <p class="hero-text">
+          Dashboard ini menganalisis kanal YouTube terbesar di dunia berdasarkan jumlah subscribers,
+          video views, kategori konten, negara, dan produktivitas upload. Semua chart bersifat interaktif,
+          memiliki tooltip, animasi, filter, pencarian, dan tabel data dinamis.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#charts">Lihat Dashboard</a>
+          <button class="secondary-btn" id="downloadCsv" type="button">Download CSV Filtered</button>
+        </div>
+        <div class="source-pill">
+          <span>📌 Sumber:</span>
+          <a href="https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023" target="_blank" rel="noreferrer">
+            Kaggle — Global YouTube Statistics 2023
+          </a>
+        </div>
+      </div>
+      <aside class="hero-card" aria-label="Ringkasan dataset">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <p>Dataset Snapshot</p>
+        <strong>Top Global Channels</strong>
+        <div class="hero-meter">
+          <span>Subscribers</span>
+          <div><i style="width: 92%"></i></div>
+        </div>
+        <div class="hero-meter">
+          <span>Video Views</span>
+          <div><i style="width: 86%"></i></div>
+        </div>
+        <div class="hero-meter">
+          <span>Country Coverage</span>
+          <div><i style="width: 74%"></i></div>
+        </div>
+        <div class="mini-stat-grid">
+          <span><b id="heroRows">0</b><small>Rows</small></span>
+          <span><b>5</b><small>Charts</small></span>
+          <span><b>6+</b><small>Filters</small></span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="kpi-section section-reveal" id="overview" aria-label="KPI utama">
+      <article class="kpi-card">
+        <span class="kpi-icon">📺</span>
+        <small>Total Channel</small>
+        <strong data-kpi="channels">0</strong>
+        <p>Jumlah channel pada subset yang sedang aktif.</p>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-icon">👥</span>
+        <small>Total Subscribers</small>
+        <strong data-kpi="subscribers">0</strong>
+        <p>Akumulasi subscribers dari channel terfilter.</p>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-icon">▶️</span>
+        <small>Total Views</small>
+        <strong data-kpi="views">0</strong>
+        <p>Total video views pada dataset aktif.</p>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-icon">🌍</span>
+        <small>Negara Dominan</small>
+        <strong data-kpi="topCountry">-</strong>
+        <p>Negara dengan jumlah channel terbanyak.</p>
+      </article>
+    </section>
+
+    <section class="control-panel section-reveal" aria-label="Panel filter dashboard">
+      <div class="control-title">
+        <p class="eyebrow">Interaktivitas</p>
+        <h2>Filter dan eksplorasi data</h2>
+      </div>
+      <label>
+        Search channel
+        <input type="search" id="searchInput" placeholder="Contoh: T-Series, MrBeast, BTS..." />
+      </label>
+      <label>
+        Negara
+        <select id="countryFilter"></select>
+      </label>
+      <label>
+        Kategori
+        <select id="categoryFilter"></select>
+      </label>
+      <label>
+        Urutkan
+        <select id="sortBy">
+          <option value="subscribers">Subscribers tertinggi</option>
+          <option value="views">Views tertinggi</option>
+          <option value="uploads">Upload terbanyak</option>
+          <option value="rank">Rank Kaggle</option>
+        </select>
+      </label>
+      <label class="range-label">
+        Tampilkan Top <span id="topNValue">15</span>
+        <input type="range" id="topN" min="5" max="30" value="15" />
+      </label>
+      <button class="ghost-btn" id="resetFilters" type="button">Reset filter</button>
+    </section>
+
+    <section class="chart-grid section-reveal" id="charts">
+      <article class="chart-card chart-card-wide">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Chart 1</p>
+            <h2>Top Subscribers by Channel</h2>
+          </div>
+          <span class="tag">Bar Chart</span>
+        </div>
+        <canvas id="subscriberChart" aria-label="Bar chart top subscribers" role="img"></canvas>
+      </article>
+
+      <article class="chart-card">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Chart 2</p>
+            <h2>Komposisi Kategori</h2>
+          </div>
+          <span class="tag">Doughnut</span>
+        </div>
+        <canvas id="categoryChart" aria-label="Doughnut chart kategori channel" role="img"></canvas>
+      </article>
+
+      <article class="chart-card">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Chart 3</p>
+            <h2>Subscribers vs Video Views</h2>
+          </div>
+          <span class="tag">Scatter</span>
+        </div>
+        <canvas id="scatterChart" aria-label="Scatter plot subscribers dan video views" role="img"></canvas>
+      </article>
+
+      <article class="chart-card chart-card-wide">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Chart 4</p>
+            <h2>Video Views per Channel</h2>
+          </div>
+          <span class="tag">Horizontal Bar</span>
+        </div>
+        <canvas id="viewsChart" aria-label="Horizontal bar chart video views" role="img"></canvas>
+      </article>
+
+      <article class="chart-card chart-card-wide">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Chart 5</p>
+            <h2>Subscriber Share by Country</h2>
+          </div>
+          <span class="tag">Polar Area</span>
+        </div>
+        <canvas id="countryChart" aria-label="Polar area chart negara" role="img"></canvas>
+      </article>
+    </section>
+
+    <section class="insight-section section-reveal" id="insight">
+      <div class="insight-main">
+        <p class="eyebrow">Insight Otomatis</p>
+        <h2>Ringkasan dari data yang sedang difilter</h2>
+        <p id="mainInsight">
+          Dashboard akan menghitung insight setelah data dimuat.
+        </p>
+      </div>
+      <div class="insight-list" id="insightList" aria-live="polite"></div>
+    </section>
+
+    <section class="table-section section-reveal" id="data-table">
+      <div class="table-heading">
+        <div>
+          <p class="eyebrow">Data Table</p>
+          <h2>Detail channel dalam dataset</h2>
+        </div>
+        <p id="tableCount">0 data ditampilkan</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Channel</th>
+              <th>Category</th>
+              <th>Country</th>
+              <th>Subscribers</th>
+              <th>Views</th>
+              <th>Uploads</th>
+            </tr>
+          </thead>
+          <tbody id="dataRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Dibuat untuk Proyek Akhir Visualisasi Data. Dataset diambil dari Kaggle Global YouTube Statistics 2023,
+      lalu dibersihkan menjadi subset statis agar mudah di-deploy ke Vercel tanpa backend.
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
