@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Dashboard visualisasi data interaktif berbasis data Kaggle Global YouTube Statistics 2023." />
-  <title>YouTube Pulse — Apple Style Data Dashboard</title>
+  <meta name="description" content="Dashboard interaktif proyek akhir Visualisasi Data tentang pola channel YouTube global." />
+  <title>YouTube Pulse — Dashboard Visualisasi Data</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -27,6 +27,7 @@
         <a href="#charts">Charts</a>
         <a href="#insight">Insight</a>
         <a href="#data-table">Data</a>
+        <a href="#team">Tim</a>
       </div>
 
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ganti tema dashboard">☾</button>
@@ -37,16 +38,17 @@
     <section class="hero section-reveal">
       <div class="hero-copy">
         <p class="eyebrow">Proyek Akhir — CA4XB3 Visualisasi Data</p>
-        <h1>Global YouTube analytics, beautifully visualized.</h1>
+        <h1>Melihat peta channel YouTube global dengan cara yang lebih rapi.</h1>
         <p class="hero-text">
-          Dashboard interaktif untuk membaca pola kanal YouTube terbesar di dunia berdasarkan subscribers,
-          video views, kategori konten, negara, dan produktivitas upload. Dibuat dengan gaya visual bersih,
-          sleek, modern, dan siap dipresentasikan dari URL publik Vercel.
+          Di dashboard ini kami mencoba membaca pola channel YouTube terbesar di dunia: siapa yang paling besar
+          dari sisi subscribers, bagaimana sebaran negaranya, kategori apa yang sering muncul, sampai seberapa
+          produktif tiap channel dalam mengunggah video. Semua visual dibuat interaktif supaya data bisa langsung
+          dieksplor saat presentasi, bukan hanya dilihat sebagai gambar statis.
         </p>
 
         <div class="hero-actions">
-          <a class="primary-btn" href="#charts">Explore dashboard</a>
-          <button class="secondary-btn" id="downloadCsv" type="button">Download filtered CSV</button>
+          <a class="primary-btn" href="#charts">Mulai eksplorasi</a>
+          <button class="secondary-btn" id="downloadCsv" type="button">Download data terfilter</button>
         </div>
 
         <div class="source-pill">
@@ -62,8 +64,8 @@
           <span></span><span></span><span></span>
         </div>
         <div class="hero-visual-top">
-          <p>Dataset Snapshot</p>
-          <strong>Top Global Channels</strong>
+          <p>Yang kami olah</p>
+          <strong>Top Global YouTube Channels</strong>
         </div>
         <div class="hero-meter">
           <span>Subscribers</span>
@@ -78,9 +80,9 @@
           <div><i style="width: 74%"></i></div>
         </div>
         <div class="mini-stat-grid">
-          <span><b id="heroRows">0</b><small>Rows</small></span>
-          <span><b>5</b><small>Charts</small></span>
-          <span><b>Real</b><small>Kaggle Data</small></span>
+          <span><b id="heroRows">0</b><small>Data</small></span>
+          <span><b>5</b><small>Chart</small></span>
+          <span><b>Live</b><small>Interaksi</small></span>
         </div>
       </aside>
     </section>
@@ -115,7 +117,7 @@
     <section class="control-panel section-reveal" aria-label="Panel filter dashboard">
       <div class="control-title">
         <p class="eyebrow">Interactivity</p>
-        <h2>Refine the signal.</h2>
+        <h2>Atur tampilan data.</h2>
       </div>
 
       <label>
@@ -144,6 +146,59 @@
         <input type="range" id="topN" min="5" max="30" value="15" />
       </label>
       <button class="ghost-btn" id="resetFilters" type="button">Reset</button>
+    </section>
+
+    <section class="active-summary section-reveal" aria-label="Ringkasan filter aktif">
+      <div>
+        <p class="eyebrow">Current View</p>
+        <h2 id="activeFilterSummary">Semua channel ditampilkan.</h2>
+      </div>
+      <p>Gunakan filter, quick preset, atau klik baris tabel untuk melihat detail channel tertentu.</p>
+    </section>
+
+    <section class="preset-strip section-reveal" aria-label="Preset eksplorasi cepat">
+      <button class="preset-chip is-active" type="button" data-preset="all">Semua channel</button>
+      <button class="preset-chip" type="button" data-preset="music">Fokus Music</button>
+      <button class="preset-chip" type="button" data-preset="education">Fokus Education</button>
+      <button class="preset-chip" type="button" data-preset="india">Channel India</button>
+      <button class="preset-chip" type="button" data-preset="usa">Channel United States</button>
+      <button class="preset-chip" type="button" data-preset="uploads">Upload terbanyak</button>
+    </section>
+
+    <section class="spotlight-section section-reveal">
+      <article class="spotlight-card" aria-label="Channel yang sedang dipilih">
+        <div class="spotlight-head">
+          <div>
+            <p class="eyebrow">Channel Spotlight</p>
+            <h2 id="spotlightName">Pilih channel</h2>
+          </div>
+          <span class="tag" id="spotlightRank">Rank</span>
+        </div>
+        <p id="spotlightMeta" class="spotlight-meta">Klik salah satu bar chart, bubble, atau baris tabel untuk melihat detailnya di sini.</p>
+        <div class="spotlight-metrics">
+          <span><small>Subscribers</small><b id="spotlightSubs">-</b></span>
+          <span><small>Video Views</small><b id="spotlightViews">-</b></span>
+          <span><small>Uploads</small><b id="spotlightUploads">-</b></span>
+        </div>
+        <div class="spotlight-bars">
+          <label>Subscriber scale<i><em id="spotlightSubsBar"></em></i></label>
+          <label>Views scale<i><em id="spotlightViewsBar"></em></i></label>
+          <label>Upload scale<i><em id="spotlightUploadsBar"></em></i></label>
+        </div>
+      </article>
+
+      <article class="team-card" id="team" aria-label="Anggota kelompok">
+        <p class="eyebrow">Our Team</p>
+        <h2>Kelompok Visualisasi Data</h2>
+        <p class="team-intro">Dashboard ini kami susun sebagai project akhir CA4XB3 Visualisasi Data.</p>
+        <div class="member-grid">
+          <span><b>William Azaria Simanjuntak</b><small>103012340356</small></span>
+          <span><b>Elshaday Debora Sambeka</b><small>103012330290</small></span>
+          <span><b>Meyra Firdhaus Isnaini</b><small>103012300179</small></span>
+          <span><b>Muhammad Jovan Pratama</b><small>1301224156</small></span>
+          <span><b>Azkal Azkiya Zalfa</b><small>1301224422</small></span>
+        </div>
+      </article>
     </section>
 
     <section class="chart-grid section-reveal" id="charts">
@@ -216,7 +271,7 @@
       <div class="table-heading">
         <div>
           <p class="eyebrow">Data Table</p>
-          <h2>Channel details</h2>
+          <h2>Detail channel</h2>
         </div>
         <p id="tableCount">0 data ditampilkan</p>
       </div>
@@ -241,7 +296,8 @@
 
   <footer class="site-footer">
     <p>
-      Dibuat untuk Proyek Akhir Visualisasi Data. Dataset Kaggle Global YouTube Statistics 2023 dibersihkan menjadi subset statis agar dashboard bisa diakses cepat lewat Vercel tanpa backend.
+      Project ini kami buat untuk memenuhi Proyek Akhir CA4XB3 Visualisasi Data. Data dari Kaggle kami rapikan menjadi
+      dataset statis agar dashboard tetap ringan, cepat dibuka, dan bisa dipresentasikan langsung melalui URL publik Vercel.
     </p>
   </footer>
 

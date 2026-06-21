@@ -51,6 +51,8 @@ const state = {
   category: "All",
   sortBy: "subscribers",
   topN: 15,
+  selectedChannel: "T-Series",
+  activePreset: "all",
   theme: localStorage.getItem("yt-dashboard-theme") || "light"
 };
 
@@ -445,12 +447,114 @@ function updateInsights(data) {
   `).join("");
 }
 
+
+function getChannelByName(name) {
+  return channels.find((item) => item.youtuber === name) || channels[0];
+}
+
+function setSelectedChannel(name) {
+  state.selectedChannel = name;
+  renderSpotlight();
+  highlightSelectedRow();
+}
+
+function getMaxMetric(metric) {
+  return Math.max(...channels.map((item) => item[metric]));
+}
+
+function renderActiveSummary() {
+  const parts = [];
+  if (state.search) parts.push(`search "${state.search}"`);
+  if (state.country !== "All") parts.push(`negara ${state.country}`);
+  if (state.category !== "All") parts.push(`kategori ${state.category}`);
+  const sortLabel = {
+    subscribers: "subscribers tertinggi",
+    views: "views tertinggi",
+    uploads: "upload terbanyak",
+    rank: "rank Kaggle"
+  }[state.sortBy];
+
+  const filterText = parts.length ? parts.join(" • ") : "semua channel";
+  els.activeFilterSummary.textContent = `Menampilkan ${filterText}, diurutkan berdasarkan ${sortLabel}, Top ${state.topN}.`;
+}
+
+function renderSpotlight() {
+  const item = getChannelByName(state.selectedChannel);
+  els.spotlightName.textContent = item.youtuber;
+  els.spotlightRank.textContent = `Rank #${item.rank}`;
+  els.spotlightMeta.textContent = `${item.category} • ${item.country}. Channel ini memiliki ${formatMillion(item.subscribers)} subscribers, ${formatBillion(item.views)} video views, dan ${formatNumber(item.uploads)} uploads pada dataset.`;
+  els.spotlightSubs.textContent = formatMillion(item.subscribers);
+  els.spotlightViews.textContent = formatBillion(item.views);
+  els.spotlightUploads.textContent = formatNumber(item.uploads);
+  els.spotlightSubsBar.style.width = `${Math.max(3, (item.subscribers / getMaxMetric("subscribers")) * 100)}%`;
+  els.spotlightViewsBar.style.width = `${Math.max(3, (item.views / getMaxMetric("views")) * 100)}%`;
+  els.spotlightUploadsBar.style.width = `${Math.max(3, (item.uploads / getMaxMetric("uploads")) * 100)}%`;
+}
+
+function highlightSelectedRow() {
+  document.querySelectorAll("#dataRows tr").forEach((row) => {
+    row.classList.toggle("is-selected", row.dataset.channel === state.selectedChannel);
+  });
+}
+
+function applyPreset(preset) {
+  state.activePreset = preset;
+  state.search = "";
+  state.country = "All";
+  state.category = "All";
+  state.sortBy = "subscribers";
+  state.topN = 15;
+
+  if (preset === "music") state.category = "Music";
+  if (preset === "education") state.category = "Education";
+  if (preset === "india") state.country = "India";
+  if (preset === "usa") state.country = "United States";
+  if (preset === "uploads") {
+    state.sortBy = "uploads";
+    state.topN = 20;
+  }
+
+  els.searchInput.value = state.search;
+  els.countryFilter.value = state.country;
+  els.categoryFilter.value = state.category;
+  els.sortBy.value = state.sortBy;
+  els.topN.value = String(state.topN);
+  els.topNValue.textContent = state.topN;
+
+  document.querySelectorAll(".preset-chip").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.preset === preset);
+  });
+
+  const firstMatch = getFilteredData()[0];
+  if (firstMatch) state.selectedChannel = firstMatch.youtuber;
+  updateDashboard();
+}
+
+function bindChartSelection(chart, type = "label") {
+  if (!chart || !chart.canvas) return;
+  chart.canvas.onclick = (event) => {
+    const points = chart.getElementsAtEventForMode(event, "nearest", { intersect: true }, true);
+    if (!points.length) return;
+    const point = points[0];
+    const label = type === "bubble"
+      ? chart.data.datasets[point.datasetIndex].data[point.index].label
+      : chart.data.labels[point.index];
+    if (label) setSelectedChannel(label);
+  };
+}
+
+function bindAllChartSelections() {
+  bindChartSelection(charts.subscriber);
+  bindChartSelection(charts.views);
+  bindChartSelection(charts.scatter, "bubble");
+}
+
 function renderTable(data) {
   const maxSubscribers = Math.max(...channels.map((item) => item.subscribers));
 
   els.tableCount.textContent = `${data.length} data ditampilkan`;
   els.dataRows.innerHTML = data.map((item) => `
-    <tr>
+    <tr data-channel="${item.youtuber}" class="${item.youtuber === state.selectedChannel ? 'is-selected' : ''}">
       <td>#${item.rank}</td>
       <td>
         <div class="channel-cell">
@@ -470,6 +574,10 @@ function renderTable(data) {
       <td>${formatNumber(item.uploads)}</td>
     </tr>
   `).join("");
+
+  document.querySelectorAll("#dataRows tr").forEach((row) => {
+    row.addEventListener("click", () => setSelectedChannel(row.dataset.channel));
+  });
 }
 
 function updateDashboard() {
@@ -477,6 +585,8 @@ function updateDashboard() {
   updateKpis(data);
   updateCharts(data);
   updateInsights(data);
+  renderActiveSummary();
+  renderSpotlight();
   renderTable(data);
 }
 
@@ -494,28 +604,39 @@ function downloadFilteredCsv() {
   URL.revokeObjectURL(url);
 }
 
+
+function markPresetAsCustom() {
+  state.activePreset = "custom";
+  document.querySelectorAll(".preset-chip").forEach((button) => button.classList.remove("is-active"));
+}
+
 function bindEvents() {
   els.searchInput.addEventListener("input", (event) => {
+    markPresetAsCustom();
     state.search = event.target.value.trim();
     updateDashboard();
   });
 
   els.countryFilter.addEventListener("change", (event) => {
+    markPresetAsCustom();
     state.country = event.target.value;
     updateDashboard();
   });
 
   els.categoryFilter.addEventListener("change", (event) => {
+    markPresetAsCustom();
     state.category = event.target.value;
     updateDashboard();
   });
 
   els.sortBy.addEventListener("change", (event) => {
+    markPresetAsCustom();
     state.sortBy = event.target.value;
     updateDashboard();
   });
 
   els.topN.addEventListener("input", (event) => {
+    markPresetAsCustom();
     state.topN = Number(event.target.value);
     els.topNValue.textContent = state.topN;
     updateDashboard();
@@ -527,12 +648,18 @@ function bindEvents() {
     state.category = "All";
     state.sortBy = "subscribers";
     state.topN = 15;
+    state.activePreset = "all";
     els.searchInput.value = "";
     els.countryFilter.value = "All";
     els.categoryFilter.value = "All";
     els.sortBy.value = "subscribers";
     els.topN.value = "15";
     els.topNValue.textContent = "15";
+    document.querySelectorAll(".preset-chip").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.preset === "all");
+    });
+    const firstMatch = getFilteredData()[0];
+    if (firstMatch) state.selectedChannel = firstMatch.youtuber;
     updateDashboard();
   });
 
@@ -542,8 +669,15 @@ function bindEvents() {
     applyTheme();
     Object.values(charts).forEach((chart) => chart.destroy());
     createCharts();
+    bindAllChartSelections();
     updateDashboard();
   });
+
+  els.presetButtons.forEach((button) => {
+    button.addEventListener("click", () => applyPreset(button.dataset.preset));
+  });
+
+  bindAllChartSelections();
 
   els.downloadCsv.addEventListener("click", downloadFilteredCsv);
 }
@@ -584,6 +718,17 @@ function cacheElements() {
   els.insightList = $("#insightList");
   els.tableCount = $("#tableCount");
   els.dataRows = $("#dataRows");
+  els.activeFilterSummary = $("#activeFilterSummary");
+  els.presetButtons = document.querySelectorAll(".preset-chip");
+  els.spotlightName = $("#spotlightName");
+  els.spotlightRank = $("#spotlightRank");
+  els.spotlightMeta = $("#spotlightMeta");
+  els.spotlightSubs = $("#spotlightSubs");
+  els.spotlightViews = $("#spotlightViews");
+  els.spotlightUploads = $("#spotlightUploads");
+  els.spotlightSubsBar = $("#spotlightSubsBar");
+  els.spotlightViewsBar = $("#spotlightViewsBar");
+  els.spotlightUploadsBar = $("#spotlightUploadsBar");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
